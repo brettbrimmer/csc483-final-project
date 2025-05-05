@@ -41,7 +41,7 @@ def test_1word_unknown_query_10points():
 
 def test_1word_infrequent_query_10points():
     result = ir.run_query('In 2011 bell ringers for this charity started accepting digital donations to its red kettle')
-    assert ((result == 'The Salvation Army') || (result == 'Salvation Army'))
+    assert ((result == 'The Salvation Army') or (result == 'Salvation Army'))
 
 
 def test_2words_query_10points():
