@@ -69,6 +69,9 @@ class IRSystem:
 
         # calculate the tf for all documents
 
+
+
+        """
         for i in range(5,1260):
             ## Create file path with correct number of leading zeros so the number is 4 digits
             file_path = os.getcwd() + "\\" + folder_path + "\\" + "enwiki-20140602-pages-articles.xml-"
@@ -81,16 +84,24 @@ class IRSystem:
             file_path += str(i)
 
             print("going to try to open file at " + file_path)
+            """
+        # open the file
+        try:
 
-            # open the file
-            try:
+            for filename in sorted(os.listdir(folder_path)):
+                file_path = os.path.join(folder_path, filename)
+
+
                 print("Going to try to open file now")
-                
-                f = open(file_path)
+
+                # f = open(file_path)
+                f = open(file_path, 'r', encoding='utf-8')
 
                 print("file opened successfully!!")
 
                 # new_doc_started = False # lets us know whether to add to df later on
+
+                doc_terms = []
 
                 for line in f:
                     print("Looking at line" + line)
@@ -128,12 +139,12 @@ class IRSystem:
                         # self.document_count += 1
 
                 file.close(f)
-            except FileNotFoundError:
-                print(f"File not found at {file_path}")
-            except PermissionError:
-                print(f"Permission denied to read the file at {file_path}.")
-            except OSError:
-                print(f"An error occurred: {e}")
+        except FileNotFoundError:
+            print(f"File not found at {file_path}")
+        except PermissionError:
+            print(f"Permission denied to read the file at {file_path}.")
+        except OSError:
+            print(f"An error occurred: {e}")
 
         # calculate c_sum
         for doc_id in self.lnc.keys():
