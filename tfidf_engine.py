@@ -38,6 +38,30 @@ class IRSystem:
             float)  # doc_id -> sum of all ltn weights in a document # this will be the denominator for the cosine normalization. square root of (weight of all sums squared)
         total_weight = collections.defaultdict(float) # just for calculating total weight of a term across all documents for written HW
 
+        #### Work Area ####
+        ## TODO: We must allow this area to parse documents in this format:
+        """
+        
+        [[Nugent, Texas]]
+
+        CATEGORIES: Unincorporated communities in Jones County, Texas, Unincorporated communities in Texas, Abilene metropolitan area
+        
+        Nugent is an unincorporated community in Jones County, Texas, United States. According to the Handbook of Texas, the community had an estimated population of 41 in 2000.[tpl]cite web | url = http://www.tshaonline.org/handbook/online/articles/NN/hnn42.html | title = Nugent, Texas | work = | publisher = The Handbook of Texas online | date =  | accessdate = 2009-11-11[/tpl] It is part of the Abilene, Texas Metropolitan Statistical Area.
+        The Lueders-Avoca Independent School District serves area students.
+        
+        ==Climate==
+        
+        The climate in this area is characterized by hot, humid summers and generally mild to cool winters.  According to the Köppen Climate Classification system, Nugent has a humid subtropical climate, abbreviated "Cfa" on climate maps.Climate Summary for Nugent, Texas
+        
+        ==References==
+        
+        """
+        ## TODO: Iterate through files from enwiki-20140602-pages-articles.xml-0005.txt to enwiki-20140602-pages-articles.xml-1259.txt
+        ## (instead of just one file.)
+        ## For each file, set its docid tp the string in [[brackets]] instead of an integer
+        ## We can just consume the rest of it as text, then when we reach [[brackets]] again we know that's a new document
+        ## when we reach EOF, obviously we just go to the next file
+
         # calculate the tf for all documents
         for line in f:
             doc_terms = line.lower().split()  # removed lower() on 4/5/25
@@ -118,7 +142,8 @@ def main(corpus):
         results = ir.run_query(query)
         print(results)
 
-
+    ## the corpus is selected in test_boolean_queries.py on this line:
+    ## ir = tfidf_engine.IRSystem(open("wiki-small.txt"))
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("CORPUS",
