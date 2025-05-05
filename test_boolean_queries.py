@@ -6,6 +6,17 @@ import tfidf_engine
 
 ir = tfidf_engine.IRSystem(open("wiki-small.txt"))
 
+## TODO: We have to change this to test for Jeopardy questions vs. answers:
+"""
+
+BROADWAY LYRICS
+Song that says, "you make me smile with my heart; your looks are laughable, unphotographable"
+My Funny Valentine
+
+"""
+## TODO: Ignore first line.
+## I believe hte query we will run is the second line
+## result should == third line i.e. it will be a string result
 
 def test_1word_query_10points():
     results = ir.run_query('house')
