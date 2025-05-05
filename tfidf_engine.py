@@ -97,16 +97,24 @@ class IRSystem:
                 # f = open(file_path)
                 f = open(file_path, 'r', encoding='utf-8')
 
-                print("file opened successfully!!")
+                print(f"file {file_path} opened successfully!!")
 
                 # new_doc_started = False # lets us know whether to add to df later on
 
                 doc_terms = []
 
                 for line in f:
-                    print("Looking at line" + line)
+                    # print("Looking at line" + line)
+                    # print("next line")
 
-                    if line.startswith('[[') and line.endswith(']]'):
+                    # if(len(line) > 4):
+                        # print("This line ends with " + line[-4])
+
+                    # if line.startswith('[[') and line.endswith(']]'):
+                    # if(line.startswith('[[') and ']]' in line):
+                    if (line.startswith('[[') and ']]' in line[-4:] and "Image:" not in line): # some images start with [[ and end in ]], we don't want to count that as a document title
+                        # print("Found a line that starts with [[ and ends with ]]")
+                        
                         # Calculate df and lnc for previous doc_id and its terms
                         if doc_id != "": # skip for first iteration
                             for term in set(doc_terms[1:]):
@@ -124,7 +132,7 @@ class IRSystem:
                         line = line[2:len(line)-2]
                         doc_id = line
 
-                        print("Next doc_id: " + doc_id)
+                        # print("Next doc_id: " + doc_id)
 
                         # Increase doc count
                         self.document_count += 1
@@ -138,7 +146,9 @@ class IRSystem:
                         # doc_wordcount = len(doc_terms)
                         # self.document_count += 1
 
-                file.close(f)
+                print("closing file...")
+
+                f.close()
         except FileNotFoundError:
             print(f"File not found at {file_path}")
         except PermissionError:
