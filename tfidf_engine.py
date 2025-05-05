@@ -17,7 +17,7 @@ def calculate_idf(document_count, df):
 
 class IRSystem:
 
-    def __init__(self, f):
+    def __init__(self, folder_path):
         # Use lnc to weight terms in the documents:
         #   l: logarithmic tf
         #   n: no df
@@ -62,18 +62,57 @@ class IRSystem:
         ## We can just consume the rest of it as text, then when we reach [[brackets]] again we know that's a new document
         ## when we reach EOF, obviously we just go to the next file
 
-        # calculate the tf for all documents
-        for line in f:
-            doc_terms = line.lower().split()  # removed lower() on 4/5/25
-            doc_id = int(doc_terms[0])
-            doc_wordcount = len(doc_terms)
-            self.document_count += 1
+        doc_id = "" # keeps track of which wikipedia doc we are adding terms to
 
-            for term in set(doc_terms[1:]):
-                if term != '-':
-                    self.df[term] += 1
-                    self.lnc[doc_id][term] = calculate_tf(term,
-                                                          doc_terms)  # the l of the lnc. we can ignore n because it's 1. will multiply by c later
+        # calculate the tf for all documents
+        for i = 5; i <= 1259; i++:
+            ## Create file path with correct number of leading zeros so the number is 4 digits
+            file_path = "enwiki-20140602-pages-articles.xml-"
+            digit_count = len(str(i))
+            zeros_to_add = 4 - digit_count
+
+            for i = 0; i < zeros_to_add; i++:
+                file_path += "0"
+
+            file_path += str(i)
+
+            # open the file
+            f = open(file_path)
+
+            # new_doc_started = False # lets us know whether to add to df later on
+
+            for line in f:
+                if line.startswith('[[') and line.endswith(']]'):
+                    # Calculate df and lnc for previous doc_id and its terms
+                    if doc_id != "": # skip for first iteration
+                        for term in set(doc_terms[1:]):
+                            if term != '-':
+                                # add to doc frequency
+                                # if new_doc_started == True:
+                                self.df[term] += 1
+                                # new_doc_started = False
+
+                                self.lnc[doc_id][term] = calculate_tf(term,
+                                                                  doc_terms)  # the l of the lnc. we can ignore n because it's 1. will multiply by c later
+
+                    # set the new doc_id to the title of the wikipedia article
+                    line = line.strip()
+                    line = line[2:len(line)-2]
+                    doc_id = line
+
+                    # Increase doc count
+                    self.document_count += 1
+
+                    # Reset doc terms
+                    doc_terms = []
+                else:
+                    doc_terms += line.lower().split()
+                    # doc_terms = line.lower().split()  # removed lower() on 4/5/25
+                    # doc_id = int(doc_terms[0])
+                    # doc_wordcount = len(doc_terms)
+                    # self.document_count += 1
+
+
 
         # calculate c_sum
         for doc_id in self.lnc.keys():
@@ -133,7 +172,7 @@ class IRSystem:
 
 
 def main(corpus):
-    ir = IRSystem(open(corpus))
+    ir = IRSystem(corpus) ## passes along the path to the folder of wikisubset files
 
     while True:
         query = input('Query: ').strip()
