@@ -1,6 +1,7 @@
 import collections
 import math
 import argparse
+import os
 
 def calculate_tf(term, document):
     result = 1 + math.log(document.count(term), 10)
@@ -64,10 +65,13 @@ class IRSystem:
 
         doc_id = "" # keeps track of which wikipedia doc we are adding terms to
 
+        print("About to enter file loop")
+
         # calculate the tf for all documents
+
         for i in range(5,1260):
             ## Create file path with correct number of leading zeros so the number is 4 digits
-            file_path = folder_path + "/" + "enwiki-20140602-pages-articles.xml-"
+            file_path = os.getcwd() + "\\" + folder_path + "\\" + "enwiki-20140602-pages-articles.xml-"
             digit_count = len(str(i))
             zeros_to_add = 4 - digit_count
 
@@ -76,13 +80,21 @@ class IRSystem:
 
             file_path += str(i)
 
+            print("going to try to open file at " + file_path)
+
             # open the file
             try:
+                print("Going to try to open file now")
+                
                 f = open(file_path)
+
+                print("file opened successfully!!")
 
                 # new_doc_started = False # lets us know whether to add to df later on
 
                 for line in f:
+                    print("Looking at line" + line)
+
                     if line.startswith('[[') and line.endswith(']]'):
                         # Calculate df and lnc for previous doc_id and its terms
                         if doc_id != "": # skip for first iteration
@@ -101,6 +113,8 @@ class IRSystem:
                         line = line[2:len(line)-2]
                         doc_id = line
 
+                        print("Next doc_id: " + doc_id)
+
                         # Increase doc count
                         self.document_count += 1
 
@@ -115,9 +129,11 @@ class IRSystem:
 
                 file.close(f)
             except FileNotFoundError:
-                print("File not found.")
+                print(f"File not found at {file_path}")
+            except PermissionError:
+                print(f"Permission denied to read the file at {file_path}.")
             except OSError:
-                print("An error occurred while opening the file.")
+                print(f"An error occurred: {e}")
 
         # calculate c_sum
         for doc_id in self.lnc.keys():
@@ -137,6 +153,7 @@ class IRSystem:
                 total_weight[key] += self.lnc[doc_id][key]
 
     def run_query(self, query):
+        print("In run_query!")
         terms = query.lower().split()  # removed lower(). on 4/5/25
         return self._run_query(terms)
 
@@ -178,6 +195,8 @@ class IRSystem:
 
 def main(corpus):
     ir = IRSystem(corpus) ## passes along the path to the folder of wikisubset files
+
+    print("In main!")
 
     while True:
         query = input('Query: ').strip()

@@ -7,6 +7,8 @@ import tfidf_engine
 # ir = tfidf_engine.IRSystem(open("wiki-small.txt"))
 ir = tfidf_engine.IRSystem("wikisubset")
 
+print("Running tests!")
+
 ## TODO: We have to change this to test for Jeopardy questions vs. answers:
 """
 
