@@ -4,6 +4,7 @@ import argparse
 import os
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
+from nltk.tokenize import PunktTokenizer
 
 ps = PorterStemmer()
 
@@ -144,7 +145,11 @@ class IRSystem:
                         # Reset doc terms
                         doc_terms = []
                     else:
-                        doc_terms += line.lower().split()
+                        # doc_terms += line.lower().split() # best
+                        tokens = word_tokenize(line.lower()) #ps
+                        stemmed_tokens = [ps.stem(token) for token in tokens] #ps
+                        doc_terms += stemmed_tokens #ps
+
                         # doc_terms = line.lower().split()  # removed lower() on 4/5/25
                         # doc_id = int(doc_terms[0])
                         # doc_wordcount = len(doc_terms)
@@ -179,7 +184,10 @@ class IRSystem:
 
     def run_query(self, query):
         print("In run_query!")
-        terms = query.lower().split()  # removed lower(). on 4/5/25
+        # terms = query.lower().split()  # removed lower(). on 4/5/25 #best
+        tokens = word_tokenize(query.lower()) #ps
+        terms = [ps.stem(token) for token in tokens] #ps
+
         return self._run_query(terms)
 
     def _run_query(self, terms):
