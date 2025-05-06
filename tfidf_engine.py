@@ -2,6 +2,10 @@ import collections
 import math
 import argparse
 import os
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
+
+ps = PorterStemmer()
 
 def calculate_tf(term, document):
     result = 1 + math.log(document.count(term), 10)
@@ -208,10 +212,16 @@ class IRSystem:
                 cosine_similarity[doc_id] += ltn[term] * self.lnc[doc_id][term]
 
         # Sort the cosine similarity values in descending order
-        top_10_results = sorted(cosine_similarity, key=cosine_similarity.get, reverse=True)
+        top_50_results = sorted(cosine_similarity, key=cosine_similarity.get, reverse=True)
+
+        print(f"Items for {terms}: ")
+
+        for i in range(len(top_50_results)):
+            if(i < 50):
+                print(f"Item {i}: {top_50_results[i]}")
 
         # Return the top 10 results
-        return top_10_results[:10]
+        return top_50_results[:50]
 
 
 def main(corpus):
