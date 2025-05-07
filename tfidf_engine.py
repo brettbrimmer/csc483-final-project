@@ -9,17 +9,46 @@ from nltk.tokenize import PunktTokenizer
 ps = PorterStemmer()
 
 def stem_token(token):
+    # if("'" not in my_token):
     my_token = ps.stem(token)
 
     """
-    if(len(my_token) <= 2
-    or token.lower() == "hodgepodge"
-    or token.lower() == "potpourri"
-    or token.lower() == "alex"
-    or token.lower() == "give"
-    or token.lower() == "you""):
+    if(len(my_token) == 1
+        or token.lower() == "the"
+        or token.lower() == "an"
+        or token.lower() == "and"
+        or token.lower() == "in"
+        or token.lower() == "to"
+        or token.lower() == "is"
+        or token.lower() == "are"
+        or token.lower() == "was"
+        or token.lower() == "were"
+        or token.lower() == "it"
+        or token.lower() == "that"
+        or token.lower() == "this"
+        or token.lower() == "with"
+        or token.lower() == "as"
+        or token.lower() == "for"
+        or token.lower() == "by"
+        or token.lower() == "be"
+        or token.lower() == "at"
+        or token.lower() == "don"       # terms with apostrophes that will be weird when stemmed
+        or token.lower() == "won"
+        or token.lower() == "she"
+        or token.lower() == "he"
+        or token.lower() == "we"
+        or token.lower() == "you"
+        or token.lower() == "it"
+        or token.lower() == "they"
+        or token.lower() == "hasn"
+        or token.lower() == "hadn"
+    ):
         my_token = ""
         """
+
+    # if it's all non-alphanumeric, turn it into an empty string
+    if all(not char.isalnum() for char in my_token):
+        my_token = ""
 
     return my_token;
 

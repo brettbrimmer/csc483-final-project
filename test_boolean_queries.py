@@ -27,6 +27,16 @@ def save_output_to_file(output, correct_answer, file_name):
     with open(file_name, "a", encoding="utf-8") as f:
         f.write(f"Correct Answer: {correct_answer}\n")
 
+        if(correct_answer in output):
+            f.write(f"ANSWER FOUND FOR {correct_answer}")
+
+        if isinstance(output, list):
+            for idx, item in enumerate(output[:50], start=1):
+                f.write(f"{idx}. {item}\n")
+        else:
+            f.write(str(output).strip() + "\n")
+
+
 def test_q1():
     result = ir.run_query('NEWSPAPERS The dominant paper in our nation\'s capital, it\'s among the top 10 U.S. papers in circulation')
     save_output_to_file(str(result), 'The Washington Post', "pytest_output.txt")
