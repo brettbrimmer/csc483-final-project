@@ -31,7 +31,7 @@ def save_output_to_file(output, correct_answer, file_name):
             f.write(f"ANSWER FOUND FOR {correct_answer}")
 
         if isinstance(output, list):
-            for idx, item in enumerate(output[:50], start=1):
+            for idx, item in enumerate(output[:600], start=1):
                 f.write(f"{idx}. {item}\n")
         else:
             f.write(str(output).strip() + "\n")
