@@ -8,6 +8,21 @@ from nltk.tokenize import PunktTokenizer
 
 ps = PorterStemmer()
 
+def stem_token(token):
+    my_token = ps.stem(token)
+
+    """
+    if(len(my_token) <= 2
+    or token.lower() == "hodgepodge"
+    or token.lower() == "potpourri"
+    or token.lower() == "alex"
+    or token.lower() == "give"
+    or token.lower() == "you""):
+        my_token = ""
+        """
+
+    return my_token;
+
 def calculate_tf(term, document):
     result = 1 + math.log(document.count(term), 10)
     return result
@@ -20,6 +35,7 @@ def calculate_idf(document_count, df):
         result = 0
 
     return result;
+
 
 class IRSystem:
 
@@ -42,25 +58,26 @@ class IRSystem:
         self.lnc = collections.defaultdict(lambda: collections.defaultdict(float))  # doc_id -> term -> lnc(float)
         self.c_sum = collections.defaultdict(
             float)  # doc_id -> sum of all ltn weights in a document # this will be the denominator for the cosine normalization. square root of (weight of all sums squared)
-        total_weight = collections.defaultdict(float) # just for calculating total weight of a term across all documents for written HW
+        total_weight = collections.defaultdict(
+            float)  # just for calculating total weight of a term across all documents for written HW
 
         #### Work Area ####
         ## TODO: We must allow this area to parse documents in this format:
         """
-        
+
         [[Nugent, Texas]]
 
         CATEGORIES: Unincorporated communities in Jones County, Texas, Unincorporated communities in Texas, Abilene metropolitan area
-        
+
         Nugent is an unincorporated community in Jones County, Texas, United States. According to the Handbook of Texas, the community had an estimated population of 41 in 2000.[tpl]cite web | url = http://www.tshaonline.org/handbook/online/articles/NN/hnn42.html | title = Nugent, Texas | work = | publisher = The Handbook of Texas online | date =  | accessdate = 2009-11-11[/tpl] It is part of the Abilene, Texas Metropolitan Statistical Area.
         The Lueders-Avoca Independent School District serves area students.
-        
+
         ==Climate==
-        
+
         The climate in this area is characterized by hot, humid summers and generally mild to cool winters.  According to the Köppen Climate Classification system, Nugent has a humid subtropical climate, abbreviated "Cfa" on climate maps.Climate Summary for Nugent, Texas
-        
+
         ==References==
-        
+
         """
         ## TODO: Iterate through files from enwiki-20140602-pages-articles.xml-0005.txt to enwiki-20140602-pages-articles.xml-1259.txt
         ## (instead of just one file.)
@@ -68,13 +85,11 @@ class IRSystem:
         ## We can just consume the rest of it as text, then when we reach [[brackets]] again we know that's a new document
         ## when we reach EOF, obviously we just go to the next file
 
-        doc_id = "" # keeps track of which wikipedia doc we are adding terms to
+        doc_id = ""  # keeps track of which wikipedia doc we are adding terms to
 
         print("About to enter file loop")
 
         # calculate the tf for all documents
-
-
 
         """
         for i in range(5,1260):
@@ -96,8 +111,9 @@ class IRSystem:
             for filename in sorted(os.listdir(folder_path)):
                 file_path = os.path.join(folder_path, filename)
 
-
                 print("Going to try to open file now")
+                with open("printstatements.txt", "a") as newFile: newFile.write("Opening a file...\n\n")
+
 
                 # f = open(file_path)
                 f = open(file_path, 'r', encoding='utf-8')
@@ -113,15 +129,16 @@ class IRSystem:
                     # print("next line")
 
                     # if(len(line) > 4):
-                        # print("This line ends with " + line[-4])
+                    # print("This line ends with " + line[-4])
 
                     # if line.startswith('[[') and line.endswith(']]'):
                     # if(line.startswith('[[') and ']]' in line):
-                    if (line.startswith('[[') and ']]' in line[-4:] and "Image:" not in line): # some images start with [[ and end in ]], we don't want to count that as a document title
+                    if (line.startswith('[[') and ']]' in line[
+                                                          -4:] and "Image:" not in line):  # some images start with [[ and end in ]], we don't want to count that as a document title
                         # print("Found a line that starts with [[ and ends with ]]")
-                        
+
                         # Calculate df and lnc for previous doc_id and its terms
-                        if doc_id != "": # skip for first iteration
+                        if doc_id != "":  # skip for first iteration
                             for term in set(doc_terms[1:]):
                                 if term != '-':
                                     # add to doc frequency
@@ -130,11 +147,11 @@ class IRSystem:
                                     # new_doc_started = False
 
                                     self.lnc[doc_id][term] = calculate_tf(term,
-                                                                      doc_terms)  # the l of the lnc. we can ignore n because it's 1. will multiply by c later
+                                                                          doc_terms)  # the l of the lnc. we can ignore n because it's 1. will multiply by c later
 
                         # set the new doc_id to the title of the wikipedia article
                         line = line.strip()
-                        line = line[2:len(line)-2]
+                        line = line[2:len(line) - 2]
                         doc_id = line
 
                         # print("Next doc_id: " + doc_id)
@@ -146,9 +163,10 @@ class IRSystem:
                         doc_terms = []
                     else:
                         # doc_terms += line.lower().split() # best
-                        tokens = word_tokenize(line.lower()) #ps
-                        stemmed_tokens = [ps.stem(token) for token in tokens] #ps
-                        doc_terms += stemmed_tokens #ps
+                        tokens = word_tokenize(line.lower())  # ps
+                        # stemmed_tokens = [ps.stem(token) for token in tokens]  # ps
+                        stemmed_tokens = [stem_token(token) for token in tokens]  # ps
+                        doc_terms += stemmed_tokens  # ps
 
                         # doc_terms = line.lower().split()  # removed lower() on 4/5/25
                         # doc_id = int(doc_terms[0])
@@ -176,7 +194,8 @@ class IRSystem:
 
         for doc_id in self.lnc.keys():  # iterate over all doc_ids in the doc_id hashmap
             for key in self.lnc[doc_id].keys():  # iterate over all terms in the lnc hashmap
-                if (self.c_sum[doc_id] != 0): # if this term has a weight of 0, its c_sum will be 0, so we don't want to divide by 0
+                if (self.c_sum[
+                    doc_id] != 0):  # if this term has a weight of 0, its c_sum will be 0, so we don't want to divide by 0
                     self.lnc[doc_id][key] = self.lnc[doc_id][key] / self.c_sum[doc_id]
                 else:
                     self.lnc[doc_id][key] = 0
@@ -185,8 +204,9 @@ class IRSystem:
     def run_query(self, query):
         print("In run_query!")
         # terms = query.lower().split()  # removed lower(). on 4/5/25 #best
-        tokens = word_tokenize(query.lower()) #ps
-        terms = [ps.stem(token) for token in tokens] #ps
+        tokens = word_tokenize(query.lower())  # ps
+        # terms = [ps.stem(token) for token in tokens]  # ps
+        terms = [stem_token(token) for token in tokens]  # ps
 
         return self._run_query(terms)
 
@@ -220,22 +240,28 @@ class IRSystem:
                 cosine_similarity[doc_id] += ltn[term] * self.lnc[doc_id][term]
 
         # Sort the cosine similarity values in descending order
-        top_50_results = sorted(cosine_similarity, key=cosine_similarity.get, reverse=True)
+        top_100_results = sorted(cosine_similarity, key=cosine_similarity.get, reverse=True)
 
-        print(f"Items for {terms}: ")
+        # print(f"Items for {terms}: ")
+        # open('printstatements.txt', 'a').write(f"Items for {terms}: ")
+        with open("printstatements.txt", "a") as newFile: newFile.write(f"Items for {terms}: \n\n")
 
-        for i in range(len(top_50_results)):
-            if(i < 50):
-                print(f"Item {i}: {top_50_results[i]}")
+        for i in range(len(top_100_results)):
+            if (i < 100):
+                # print(f"Item {i}: {top_100_results[i]}")
+                # open('printstatements.txt', 'a').write(f"Item {i}: {top_100_results[i]}")
+                with open("printstatements.txt", "a") as newFile: newFile.write(f"Item {i}: {top_100_results[i]}\n")
 
-        # Return the top 10 results
-        return top_50_results[:50]
+        # Return the top 100 results
+        return top_100_results[:100]
 
 
 def main(corpus):
-    ir = IRSystem(corpus) ## passes along the path to the folder of wikisubset files
+    ir = IRSystem(corpus)  ## passes along the path to the folder of wikisubset files
 
-    print("In main!")
+    # print("In main!")
+    # open('printstatements.txt', 'a').write("In main!")
+    with open("printstatements.txt", "a") as newFile: newFile.write("In main!\n\n")
 
     while True:
         query = input('Query: ').strip()
@@ -246,6 +272,8 @@ def main(corpus):
 
     ## the corpus is selected in test_boolean_queries.py on this line:
     ## ir = tfidf_engine.IRSystem(open("wiki-small.txt"))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("CORPUS",
