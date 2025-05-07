@@ -269,20 +269,20 @@ class IRSystem:
                 cosine_similarity[doc_id] += ltn[term] * self.lnc[doc_id][term]
 
         # Sort the cosine similarity values in descending order
-        top_600_results = sorted(cosine_similarity, key=cosine_similarity.get, reverse=True)
+        top_750_results = sorted(cosine_similarity, key=cosine_similarity.get, reverse=True)
 
         # print(f"Items for {terms}: ")
         # open('printstatements.txt', 'a').write(f"Items for {terms}: ")
         with open("printstatements.txt", "a") as newFile: newFile.write(f"Items for {terms}: \n\n")
 
-        for i in range(len(top_600_results)):
-            if (i < 600):
-                # print(f"Item {i}: {top_600_results[i]}")
-                # open('printstatements.txt', 'a').write(f"Item {i}: {top_600_results[i]}")
-                with open("printstatements.txt", "a") as newFile: newFile.write(f"Item {i}: {top_600_results[i]}\n")
+        for i in range(len(top_750_results)):
+            if (i < 750):
+                # print(f"Item {i}: {top_750_results[i]}")
+                # open('printstatements.txt', 'a').write(f"Item {i}: {top_750_results[i]}")
+                with open("printstatements.txt", "a") as newFile: newFile.write(f"Item {i}: {top_750_results[i]}\n")
 
-        # Return the top 600 results
-        return top_600_results[:600]
+        # Return the top 750 results
+        return top_750_results[:750]
 
 
 def main(corpus):
