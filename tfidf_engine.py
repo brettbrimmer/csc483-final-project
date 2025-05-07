@@ -5,8 +5,45 @@ import os
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import PunktTokenizer
+import time
+from openai import OpenAI
+# from openai.error import RateLimitError
+from openai import RateLimitError
 
 ps = PorterStemmer()
+
+client = OpenAI(api_key="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")
+
+def query_openai(question, results):
+    prompt = (
+        f"Give me the answer to the question with one of the strings from the following list. "
+        f"Only give one answer. Only give the answer itself as a response, don't say anything else at all. Here is the question: {question} "
+        f"and here is the list: {results}"
+    )
+
+    try:
+        response = client.responses.create(
+            # model="gpt-4.1",
+            model="gpt-3.5-turbo",
+            input=prompt
+        )
+        return response.output_text
+    except RateLimitError:
+        print("Rate limit hit. Waiting 10 seconds...")
+        time.sleep(10)
+        return query_openai(question, results)
+
+def get_unicorn_story():
+    try:
+        response = client.responses.create(
+            model="gpt-4.1",
+            input="Write a one-sentence bedtime story about a unicorn."
+        )
+        return response.output_text
+    except RateLimitError:
+        print("Rate limit hit. Waiting 10 seconds...")
+        time.sleep(10)
+        return get_unicorn_story()
 
 def stem_token(token):
     # if("'" not in my_token):
@@ -237,9 +274,9 @@ class IRSystem:
         # terms = [ps.stem(token) for token in tokens]  # ps
         terms = [stem_token(token) for token in tokens]  # ps
 
-        return self._run_query(terms)
+        return self._run_query(terms, query)
 
-    def _run_query(self, terms):
+    def _run_query(self, terms, query):
         # Use ltn to weight terms in the query:
         #   l: logarithmic tf
         #   t: idf
@@ -271,6 +308,7 @@ class IRSystem:
         # Sort the cosine similarity values in descending order
         top_750_results = sorted(cosine_similarity, key=cosine_similarity.get, reverse=True)
 
+        """
         # print(f"Items for {terms}: ")
         # open('printstatements.txt', 'a').write(f"Items for {terms}: ")
         with open("printstatements.txt", "a") as newFile: newFile.write(f"Items for {terms}: \n\n")
@@ -283,7 +321,14 @@ class IRSystem:
 
         # Return the top 750 results
         return top_750_results[:750]
+        """
 
+        top_750_results = top_750_results[:750]
+
+        final_answer = ""
+        final_answer = query_openai(query, top_750_results)
+
+        return final_answer
 
 def main(corpus):
     ir = IRSystem(corpus)  ## passes along the path to the folder of wikisubset files
