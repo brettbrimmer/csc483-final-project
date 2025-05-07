@@ -23,8 +23,8 @@ def query_openai(question, results):
 
     try:
         response = client.responses.create(
-            # model="gpt-4.1",
-            model="gpt-3.5-turbo",
+            model="gpt-4.1",
+            # model="gpt-3.5-turbo",
             input=prompt
         )
         return response.output_text
@@ -32,18 +32,6 @@ def query_openai(question, results):
         print("Rate limit hit. Waiting 10 seconds...")
         time.sleep(10)
         return query_openai(question, results)
-
-def get_unicorn_story():
-    try:
-        response = client.responses.create(
-            model="gpt-4.1",
-            input="Write a one-sentence bedtime story about a unicorn."
-        )
-        return response.output_text
-    except RateLimitError:
-        print("Rate limit hit. Waiting 10 seconds...")
-        time.sleep(10)
-        return get_unicorn_story()
 
 def stem_token(token):
     # if("'" not in my_token):
@@ -306,27 +294,27 @@ class IRSystem:
                 cosine_similarity[doc_id] += ltn[term] * self.lnc[doc_id][term]
 
         # Sort the cosine similarity values in descending order
-        top_750_results = sorted(cosine_similarity, key=cosine_similarity.get, reverse=True)
+        top_850_results = sorted(cosine_similarity, key=cosine_similarity.get, reverse=True)
 
         """
         # print(f"Items for {terms}: ")
         # open('printstatements.txt', 'a').write(f"Items for {terms}: ")
         with open("printstatements.txt", "a") as newFile: newFile.write(f"Items for {terms}: \n\n")
 
-        for i in range(len(top_750_results)):
-            if (i < 750):
-                # print(f"Item {i}: {top_750_results[i]}")
-                # open('printstatements.txt', 'a').write(f"Item {i}: {top_750_results[i]}")
-                with open("printstatements.txt", "a") as newFile: newFile.write(f"Item {i}: {top_750_results[i]}\n")
+        for i in range(len(top_850_results)):
+            if (i < 850):
+                # print(f"Item {i}: {top_850_results[i]}")
+                # open('printstatements.txt', 'a').write(f"Item {i}: {top_850_results[i]}")
+                with open("printstatements.txt", "a") as newFile: newFile.write(f"Item {i}: {top_850_results[i]}\n")
 
-        # Return the top 750 results
-        return top_750_results[:750]
+        # Return the top 850 results
+        return top_850_results[:850]
         """
 
-        top_750_results = top_750_results[:750]
+        top_850_results = top_850_results[:850]
 
         final_answer = ""
-        final_answer = query_openai(query, top_750_results)
+        final_answer = query_openai(query, top_850_results)
 
         return final_answer
 
