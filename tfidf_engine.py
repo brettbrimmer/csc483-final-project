@@ -34,7 +34,7 @@ def query_openai(question, results):
         return response.output_text
     except RateLimitError:
         print("Rate limit hit. Waiting 10 seconds...")
-        time.sleep(10)
+        time.sleep(30)
         return query_openai(question, results)
 
 # performs porter-stemmer on a string 'token'. if the string was all-non-alphanumeric, turns that token into an empty string
