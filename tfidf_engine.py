@@ -40,9 +40,9 @@ def query_openai(question, results):
 # performs porter-stemmer on a string 'token'. if the string was all-non-alphanumeric, turns that token into an empty string
 # returns the modified string
 def stem_token(token):
-    # if("'" not in my_token):
     my_token = ps.stem(token)
 
+    # these stop words were removed as they were inefffective at improving the results
     """
     if(len(my_token) == 1
         or token.lower() == "the"
@@ -127,7 +127,6 @@ class IRSystem:
 
         # open the file
         try:
-
             for filename in sorted(os.listdir(folder_path)):
                 file_path = os.path.join(folder_path, filename)
 

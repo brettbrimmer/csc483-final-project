@@ -6,6 +6,7 @@ ir = tfidf_engine.IRSystem("wikisubset")
 
 with open("printstatements.txt", "a") as newFile: newFile.write("Running tests!\n\n")
 
+# saves the results list for a given query to a file and lets us know if the correct answer was found
 def save_output_to_file(output, correct_answer, file_name):
     with open(file_name, "a", encoding="utf-8") as f:
         f.write(f"Correct Answer: {correct_answer}\n")
@@ -19,6 +20,8 @@ def save_output_to_file(output, correct_answer, file_name):
         else:
             f.write(str(output).strip() + "\n")
 
+# tests will use the ir engine to run the query, then store the answer in the result list.
+# the result list will be stored to file, then the test case will assert that it's the correct result
 
 def test_q1():
     result = ir.run_query('NEWSPAPERS The dominant paper in our nation\'s capital, it\'s among the top 10 U.S. papers in circulation')
