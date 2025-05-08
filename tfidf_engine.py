@@ -31,10 +31,11 @@ def query_openai(question, results):
             # model="gpt-3.5-turbo",
             input=prompt
         )
+        time.sleep(30)
         return response.output_text
     except RateLimitError:
         print("Rate limit hit. Waiting 10 seconds...")
-        time.sleep(30)
+        time.sleep(10)
         return query_openai(question, results)
 
 # performs porter-stemmer on a string 'token'. if the string was all-non-alphanumeric, turns that token into an empty string
@@ -131,7 +132,7 @@ class IRSystem:
                 file_path = os.path.join(folder_path, filename)
 
                 print("Going to try to open file now")
-                # with open("printstatements.txt", "a") as newFile: newFile.write("Opening a file...\n\n")
+                with open("printstatements.txt", "a") as newFile: newFile.write("Opening a file...\n\n")
 
                 f = open(file_path, 'r', encoding='utf-8')
 
@@ -248,7 +249,7 @@ class IRSystem:
 def main(corpus):
     ir = IRSystem(corpus)  ## passes along the path to the folder of wikisubset files
 
-    # with open("printstatements.txt", "a") as newFile: newFile.write("In main!\n\n")
+    with open("printstatements.txt", "a") as newFile: newFile.write("In main!\n\n")
 
     while True:
         query = input('Query: ').strip()
