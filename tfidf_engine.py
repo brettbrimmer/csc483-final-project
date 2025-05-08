@@ -3,11 +3,8 @@ import math
 import argparse
 import os
 import nltk
-nltk.download('punkt')
-nltk.download('punkt_tab')
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
-from nltk.tokenize import PunktTokenizer
 import time
 from openai import OpenAI
 # from openai.error import RateLimitError
