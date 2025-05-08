@@ -10,9 +10,11 @@ from openai import OpenAI
 # from openai.error import RateLimitError
 from openai import RateLimitError
 
+my_api_key = os.getenv("OPENAI_API_KEY")
+
 ps = PorterStemmer()
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key=my_api_key)
 
 # queries OpenAI with a question (a string), and asks it to determine the answer from the results list (a list of strings)
 # returns the string of the result picked by openai
@@ -132,13 +134,9 @@ class IRSystem:
                 print("Going to try to open file now")
                 with open("printstatements.txt", "a") as newFile: newFile.write("Opening a file...\n\n")
 
-
-                # f = open(file_path)
                 f = open(file_path, 'r', encoding='utf-8')
 
                 print(f"file {file_path} opened successfully!!")
-
-                # new_doc_started = False # lets us know whether to add to df later on
 
                 doc_terms = []
 
@@ -203,9 +201,7 @@ class IRSystem:
     # run a query for a string 'query'
     def run_query(self, query):
         print("In run_query!")
-        # terms = query.lower().split()  # removed lower(). on 4/5/25 #best
         tokens = word_tokenize(query.lower())  # ps
-        # terms = [ps.stem(token) for token in tokens]  # ps
         terms = [stem_token(token) for token in tokens]  # ps
 
         return self._run_query(terms, query)
