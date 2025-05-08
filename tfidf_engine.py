@@ -14,6 +14,8 @@ ps = PorterStemmer()
 
 client = OpenAI(api_key="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")
 
+# queries OpenAI with a question (a string), and asks it to determine the answer from the results list (a list of strings)
+# returns the string of the result picked by openai
 def query_openai(question, results):
     prompt = (
         f"Give me the answer to the question with one of the strings from the following list. "
@@ -33,6 +35,8 @@ def query_openai(question, results):
         time.sleep(10)
         return query_openai(question, results)
 
+# performs porter-stemmer on a string 'token'. if the string was all-non-alphanumeric, turns that token into an empty string
+# returns the modified string
 def stem_token(token):
     # if("'" not in my_token):
     my_token = ps.stem(token)
@@ -77,11 +81,12 @@ def stem_token(token):
 
     return my_token;
 
+# calculates term frequency formula given a term and document
 def calculate_tf(term, document):
     result = 1 + math.log(document.count(term), 10)
     return result
 
-
+# calculates idf formula given a document count and a document frequency
 def calculate_idf(document_count, df):
     if (df != 0):
         result = math.log(document_count / df)
@@ -90,7 +95,7 @@ def calculate_idf(document_count, df):
 
     return result;
 
-
+# information retrieval system
 class IRSystem:
 
     def __init__(self, folder_path):
@@ -102,7 +107,6 @@ class IRSystem:
         # Store the vecorized representation for each document
         #   and whatever information you need to vectorize queries in _run_query(...)
 
-        # YOUR CODE GOES HERE
         ## we'll keep track of:
         ## df: how many documents each term appears in at least once
         ## lnc: the score for a term in a specific document
@@ -115,50 +119,10 @@ class IRSystem:
         total_weight = collections.defaultdict(
             float)  # just for calculating total weight of a term across all documents for written HW
 
-        #### Work Area ####
-        ## TODO: We must allow this area to parse documents in this format:
-        """
-
-        [[Nugent, Texas]]
-
-        CATEGORIES: Unincorporated communities in Jones County, Texas, Unincorporated communities in Texas, Abilene metropolitan area
-
-        Nugent is an unincorporated community in Jones County, Texas, United States. According to the Handbook of Texas, the community had an estimated population of 41 in 2000.[tpl]cite web | url = http://www.tshaonline.org/handbook/online/articles/NN/hnn42.html | title = Nugent, Texas | work = | publisher = The Handbook of Texas online | date =  | accessdate = 2009-11-11[/tpl] It is part of the Abilene, Texas Metropolitan Statistical Area.
-        The Lueders-Avoca Independent School District serves area students.
-
-        ==Climate==
-
-        The climate in this area is characterized by hot, humid summers and generally mild to cool winters.  According to the Köppen Climate Classification system, Nugent has a humid subtropical climate, abbreviated "Cfa" on climate maps.Climate Summary for Nugent, Texas
-
-        ==References==
-
-        """
-        ## TODO: Iterate through files from enwiki-20140602-pages-articles.xml-0005.txt to enwiki-20140602-pages-articles.xml-1259.txt
-        ## (instead of just one file.)
-        ## For each file, set its docid tp the string in [[brackets]] instead of an integer
-        ## We can just consume the rest of it as text, then when we reach [[brackets]] again we know that's a new document
-        ## when we reach EOF, obviously we just go to the next file
-
         doc_id = ""  # keeps track of which wikipedia doc we are adding terms to
 
         print("About to enter file loop")
 
-        # calculate the tf for all documents
-
-        """
-        for i in range(5,1260):
-            ## Create file path with correct number of leading zeros so the number is 4 digits
-            file_path = os.getcwd() + "\\" + folder_path + "\\" + "enwiki-20140602-pages-articles.xml-"
-            digit_count = len(str(i))
-            zeros_to_add = 4 - digit_count
-
-            for i in range(zeros_to_add):
-                file_path += "0"
-
-            file_path += str(i)
-
-            print("going to try to open file at " + file_path)
-            """
         # open the file
         try:
 
@@ -179,18 +143,8 @@ class IRSystem:
                 doc_terms = []
 
                 for line in f:
-                    # print("Looking at line" + line)
-                    # print("next line")
-
-                    # if(len(line) > 4):
-                    # print("This line ends with " + line[-4])
-
-                    # if line.startswith('[[') and line.endswith(']]'):
-                    # if(line.startswith('[[') and ']]' in line):
                     if (line.startswith('[[') and ']]' in line[
                                                           -4:] and "Image:" not in line):  # some images start with [[ and end in ]], we don't want to count that as a document title
-                        # print("Found a line that starts with [[ and ends with ]]")
-
                         # Calculate df and lnc for previous doc_id and its terms
                         if doc_id != "":  # skip for first iteration
                             for term in set(doc_terms[1:]):
@@ -208,24 +162,15 @@ class IRSystem:
                         line = line[2:len(line) - 2]
                         doc_id = line
 
-                        # print("Next doc_id: " + doc_id)
-
                         # Increase doc count
                         self.document_count += 1
 
                         # Reset doc terms
                         doc_terms = []
                     else:
-                        # doc_terms += line.lower().split() # best
                         tokens = word_tokenize(line.lower())  # ps
-                        # stemmed_tokens = [ps.stem(token) for token in tokens]  # ps
                         stemmed_tokens = [stem_token(token) for token in tokens]  # ps
                         doc_terms += stemmed_tokens  # ps
-
-                        # doc_terms = line.lower().split()  # removed lower() on 4/5/25
-                        # doc_id = int(doc_terms[0])
-                        # doc_wordcount = len(doc_terms)
-                        # self.document_count += 1
 
                 print("closing file...")
 
@@ -255,6 +200,7 @@ class IRSystem:
                     self.lnc[doc_id][key] = 0
                 total_weight[key] += self.lnc[doc_id][key]
 
+    # run a query for a string 'query'
     def run_query(self, query):
         print("In run_query!")
         # terms = query.lower().split()  # removed lower(). on 4/5/25 #best
@@ -264,6 +210,7 @@ class IRSystem:
 
         return self._run_query(terms, query)
 
+    # helper function that actually performs the query
     def _run_query(self, terms, query):
         # Use ltn to weight terms in the query:
         #   l: logarithmic tf
@@ -273,7 +220,6 @@ class IRSystem:
         # Return the top-10 document for the query 'terms'
         result = []
 
-        # YOUR CODE GOES HERE
         ## each query term will have an ltn value, based on its tf (term frequency) and idf (inverse document frequency) value
         doc_wordcount = len(terms)
         ltn = collections.defaultdict(float)
@@ -296,21 +242,6 @@ class IRSystem:
         # Sort the cosine similarity values in descending order
         top_850_results = sorted(cosine_similarity, key=cosine_similarity.get, reverse=True)
 
-        """
-        # print(f"Items for {terms}: ")
-        # open('printstatements.txt', 'a').write(f"Items for {terms}: ")
-        with open("printstatements.txt", "a") as newFile: newFile.write(f"Items for {terms}: \n\n")
-
-        for i in range(len(top_850_results)):
-            if (i < 850):
-                # print(f"Item {i}: {top_850_results[i]}")
-                # open('printstatements.txt', 'a').write(f"Item {i}: {top_850_results[i]}")
-                with open("printstatements.txt", "a") as newFile: newFile.write(f"Item {i}: {top_850_results[i]}\n")
-
-        # Return the top 850 results
-        return top_850_results[:850]
-        """
-
         top_850_results = top_850_results[:850]
 
         final_answer = ""
@@ -318,11 +249,10 @@ class IRSystem:
 
         return final_answer
 
+# main method that passes along the corpus to the IRSystem class and runs the query
 def main(corpus):
     ir = IRSystem(corpus)  ## passes along the path to the folder of wikisubset files
 
-    # print("In main!")
-    # open('printstatements.txt', 'a').write("In main!")
     with open("printstatements.txt", "a") as newFile: newFile.write("In main!\n\n")
 
     while True:
@@ -332,10 +262,7 @@ def main(corpus):
         results = ir.run_query(query)
         print(results)
 
-    ## the corpus is selected in test_boolean_queries.py on this line:
-    ## ir = tfidf_engine.IRSystem(open("wiki-small.txt"))
-
-
+# calls main with corpus
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("CORPUS",

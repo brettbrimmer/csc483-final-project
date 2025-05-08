@@ -1,27 +1,10 @@
-# DO NOT modify code except "YOUR CODE GOES HERE" blocks
-
 from pytest import approx
 
 import tfidf_engine
 
-# ir = tfidf_engine.IRSystem(open("wiki-small.txt"))
 ir = tfidf_engine.IRSystem("wikisubset")
 
-# print("Running tests!")
 with open("printstatements.txt", "a") as newFile: newFile.write("Running tests!\n\n")
-
-
-## TODO: We have to change this to test for Jeopardy questions vs. answers:
-"""
-
-BROADWAY LYRICS
-Song that says, "you make me smile with my heart; your looks are laughable, unphotographable"
-My Funny Valentine
-
-"""
-## TODO: Ignore first line. It's just a Jeopardy category and is repeated among many questions
-## I believe the query we will run is the second line
-## result should == third line i.e. it will be a string result
 
 def save_output_to_file(output, correct_answer, file_name):
     with open(file_name, "a", encoding="utf-8") as f:
